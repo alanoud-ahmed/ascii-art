@@ -16,7 +16,7 @@ func PrintASCII(text string, banner_map map[rune][]string) (string, error) {
 	// convert newlines into \n
 	text = strings.ReplaceAll(text, "\r\n", "\n")
 
-	// NEW: check the text exactly as typed, before anything gets replaced
+	// check the text exactly as typed, before anything gets replaced
 	err := validateRawText(text)
 	if err != nil {
 		return "", err
