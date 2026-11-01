@@ -8,7 +8,7 @@ import (
 func main() {
 	// can accept text only OR text + banner name
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		fmt.Fprintln(os.Stderr, "usage : go run . \"text \" [standard | shadow | thinkertoy ]")
+		fmt.Fprintln(os.Stderr, "usage : go run . \"text \" [standard | shadow | thinkertoy]")
 		os.Exit(1)
 	}
 
@@ -26,11 +26,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	// print ASCII art
-	err = PrintASCII(text, banner)
+	// build & print the ASCII art
+	ascii, err := PrintASCII(text, banner)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
+
+	fmt.Print(ascii) // print it
 
 }

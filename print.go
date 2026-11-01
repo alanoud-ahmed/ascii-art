@@ -7,52 +7,72 @@ import (
 
 const tabSpaces = "  " // 2 spaces for \t
 
-func PrintASCII(text string, banner_map map[rune][]string) error {
+func PrintASCII(text string, banner_map map[rune][]string) (string, error) {
 
 	if text == "" { // empty input
-		return nil
+		return "", nil
 	}
 
 	// convert newlines into \n
 	text = strings.ReplaceAll(text, "\r\n", "\n")
-	text = strings.ReplaceAll(text, "\n", "\\n")
+
+	// NEW: check the text exactly as typed, before anything gets replaced
+	err := validateRawText(text)
+	if err != nil {
+		return "", err
+	}
+
+	text = strings.ReplaceAll(text, `\n`, "\n")
 
 	// convert tabs \t into 2 spaces
 	text = strings.ReplaceAll(text, "\\t", tabSpaces)
 	text = strings.ReplaceAll(text, "\t", tabSpaces)
 
 	// split text by \n
-	lines_split := strings.Split(text, "\\n")
+	lines_split := strings.Split(text, "\n")
 
 	// handling only newline inputs to remove any extra empty element
-	if strings.ReplaceAll(text, "\\n", "") == "" {
+	if strings.ReplaceAll(text, "\n", "") == "" {
 		lines_split = lines_split[:len(lines_split)-1]
 	}
 
-	// check chars before printing
-	err := validateChars(lines_split, banner_map)
+	// check chars before building the output
+	err = validateChars(lines_split, banner_map)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	// PRINTING
+	// BUILDING THE OUTPUT
+	var result strings.Builder
 	for _, line := range lines_split { //row of the entire word (line = "Hi")
 
-		if line == "" { // print a blank line for empty input lines
-			fmt.Println()
+		if line == "" { // add a blank line for empty input lines
+			result.WriteString("\n")
 			continue // skip to next input line
 		}
 
 		for row := 0; row < 8; row++ { // loop through 8 rows (rows 0 to 7 of "Hi")
 
 			for _, char := range line { // loop through each char ('H', then 'i')
-				fmt.Print(banner_map[char][row]) // print current char row
+				result.WriteString(banner_map[char][row]) // add current char row
 			}
 
-			fmt.Println() // move to next row
+			result.WriteString("\n") // move to next row
 		}
 	}
 
+	return result.String(), nil
+}
+
+// finds the first unsupported character in the text as typed and points to it with ^
+func validateRawText(text string) error {
+	count := 0
+	for _, char := range text {
+		if char != '\t' && char != '\n' && (char < ' ' || char > '~') {
+			return fmt.Errorf("unsupported character %q\n  %s\n  %s^", char, text, strings.Repeat(" ", count))
+		}
+		count++
+	}
 	return nil
 }
 
