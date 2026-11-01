@@ -70,7 +70,7 @@ func validateRawText(text string) error {
 	col := 0                  // ^ column
 	for _, char := range text {
 		if char != '\t' && char != '\n' && (char < ' ' || char > '~') {
-			return fmt.Errorf("unsupported character %q\n  %s\n  %s^", char, shown.String()+string(char)+"...", strings.Repeat(" ", col))
+			return fmt.Errorf("unsupported character %q\n  %s%c\n  %s^", char, shown.String(), char, strings.Repeat(" ", col))
 		}
 		switch char {
 		case '\t':
@@ -87,7 +87,7 @@ func validateRawText(text string) error {
 	return nil
 }
 
-// check all characters before printing
+// check all characters before building the output
 func validateChars(lines_split []string, banner_map map[rune][]string) error {
 
 	for line_index, line := range lines_split { // loop through each input line
