@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 // loadBanner --> reads the banner file and return map of eah char to its 8 lones of arts
@@ -13,7 +14,7 @@ func loadBanner(name string) (map[rune][]string, err) {
 	}
 
 	// read the whole file
-	data, err := os.ReadFile("banner/" + name + ".txt")
+	data, err := os.ReadFile(filepath.Join("template", name+".txt"))
 	if err != nil {
 		return nil, fmt.Errorf(" can not find file ")
 	}
