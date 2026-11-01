@@ -66,12 +66,23 @@ func PrintASCII(text string, banner_map map[rune][]string) (string, error) {
 
 // finds the first unsupported character in the text as typed and points to it with ^
 func validateRawText(text string) error {
-	count := 0
+	var shown strings.Builder // text as displayed
+	col := 0                  // ^ column
 	for _, char := range text {
 		if char != '\t' && char != '\n' && (char < ' ' || char > '~') {
-			return fmt.Errorf("unsupported character %q\n  %s\n  %s^", char, text, strings.Repeat(" ", count))
+			return fmt.Errorf("unsupported character %q\n  %s\n  %s^", char, shown.String()+string(char)+"...", strings.Repeat(" ", col))
 		}
-		count++
+		switch char {
+		case '\t':
+			shown.WriteString(`\t`)
+			col += 2
+		case '\n':
+			shown.WriteString(`\n`)
+			col += 2
+		default:
+			shown.WriteRune(char)
+			col++
+		}
 	}
 	return nil
 }
