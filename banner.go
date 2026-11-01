@@ -14,7 +14,7 @@ func loadBanner(name string) (map[rune][]string, err) {
 	}
 
 	// read the whole file
-	data, err := os.ReadFile(filepath.Join("template", name+".txt"))
+	data, err := os.ReadFile(filepath.Join("banners", name+".txt"))
 	if err != nil {
 		return nil, fmt.Errorf(" can not find file ")
 	}
