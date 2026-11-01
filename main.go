@@ -8,13 +8,13 @@ import (
 func main() {
 	// can accept text only OR text + banner name
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		fmt.Fprintln(os.Stderr, "usage : go run . \"text \" [standard | shadow | thinkertoy]")
+		fmt.Fprintln(os.Stderr, "usage : go run . \"text\" [standard | shadow | thinkertoy]")
 		os.Exit(1)
 	}
 
 	// saving the args
 	text := os.Args[1]
-	bannerName := "standard" // as a defult choice
+	bannerName := "standard" // as a default choice
 	if len(os.Args) == 3 {
 		bannerName = os.Args[2]
 	}
