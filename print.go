@@ -7,7 +7,7 @@ import (
 
 const tabSpaces = "  " // 2 spaces for \t
 
-func ToASCII(text string, banner_map map[rune][]string) (string, error) {
+func BuildASCII(text string, banner_map map[rune][]string) (string, error) {
 
 	if text == "" { // empty input
 		return "", nil
