@@ -6,7 +6,7 @@ import (
 )
 
 // Normal inputs: check the number of printed lines.
-func TestPrintASCII(t *testing.T) {
+func TestToASCII(t *testing.T) {
 	banner, err := loadBanner("standard")
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +35,7 @@ func TestPrintASCII(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		got, err := PrintASCII(tc.input, banner)
+		got, err := ToASCII(tc.input, banner)
 		if err != nil {
 			t.Errorf("%s: unexpected error: %v", tc.name, err)
 			continue
@@ -53,7 +53,7 @@ func TestRowsHaveSameWidth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, _ := PrintASCII("Hello There", banner)
+	got, _ := ToASCII("Hello There", banner)
 	rows := strings.Split(strings.TrimSuffix(got, "\n"), "\n")
 
 	for i, row := range rows {
@@ -76,7 +76,7 @@ func TestAllPrintableASCII(t *testing.T) {
 			input.WriteRune(char)
 		}
 
-		if _, err := PrintASCII(input.String(), banner); err != nil {
+		if _, err := ToASCII(input.String(), banner); err != nil {
 			t.Errorf("%s: %v", name, err)
 		}
 	}
@@ -91,7 +91,7 @@ func TestInvalidInput(t *testing.T) {
 
 	inputs := []string{"مرحبا", "😀", "Hi\x00", "Hello\nمرحبا", `Hello\nمرحبا`}
 	for _, input := range inputs {
-		got, err := PrintASCII(input, banner)
+		got, err := ToASCII(input, banner)
 		if err == nil || got != "" {
 			t.Errorf("%q: expected error and no output, got %q, %v", input, got, err)
 		}
@@ -117,13 +117,13 @@ func TestValidateRawText(t *testing.T) {
 // A broken banner map must give an error, not a crash.
 func TestBrokenBannerMap(t *testing.T) {
 	// 'A' is missing from the map
-	if _, err := PrintASCII("A", map[rune][]string{}); err == nil {
+	if _, err := ToASCII("A", map[rune][]string{}); err == nil {
 		t.Error("expected an error for a missing character")
 	}
 
 	// 'A' has only 3 rows instead of 8
 	short := map[rune][]string{'A': {"a", "b", "c"}}
-	if _, err := PrintASCII("A", short); err == nil {
+	if _, err := ToASCII("A", short); err == nil {
 		t.Error("expected an error for a wrong number of rows")
 	}
 }

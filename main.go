@@ -27,7 +27,7 @@ func main() {
 	}
 
 	// build & print the ASCII art
-	ascii, err := PrintASCII(text, banner)
+	ascii, err := ToASCII(text, banner)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
