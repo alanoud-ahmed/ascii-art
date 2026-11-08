@@ -22,10 +22,10 @@ func BuildASCII(text string, banner_map map[rune][]string) (string, error) {
 		return "", err
 	}
 
-	text = strings.ReplaceAll(text, `\n`, "\n")
+	//text = strings.ReplaceAll(text, `\n`, "\n")
+	text = expandEscapes(text) // convert \n, \t and \\ into their correct chars
 
 	// convert tabs \t into 2 spaces
-	text = strings.ReplaceAll(text, "\\t", tabSpaces)
 	text = strings.ReplaceAll(text, "\t", tabSpaces)
 
 	// split text by \n
@@ -64,13 +64,13 @@ func BuildASCII(text string, banner_map map[rune][]string) (string, error) {
 	return result.String(), nil
 }
 
-// finds the first unsupported character in the text as typed and points to it with ^
+// finds first unsupported character in the text as typed and points to it with ^
 func validateRawText(text string) error {
 	var shown strings.Builder // text as displayed
 	col := 0                  // ^ column
 	for _, char := range text {
 		if char != '\t' && char != '\n' && (char < ' ' || char > '~') {
-			return fmt.Errorf("unsupported character %q\n  %s%c\n  %s^", char, shown.String(), char, strings.Repeat(" ", col))
+			return fmt.Errorf("%q shows unsupported character %q\n  %s%c\n  %s^", text, char, shown.String(), char, strings.Repeat(" ", col))
 		}
 		switch char {
 		case '\t':
@@ -116,3 +116,43 @@ func validateChars(lines_split []string, banner_map map[rune][]string) error {
 
 	return nil
 }
+
+// handles escape sequences after bash has processed the quotes
+func expandEscapes(text string) string {
+	var result strings.Builder
+
+	for i := 0; i < len(text); i++ {
+
+		if text[i] == '\\' && i+1 < len(text) { // check if current is \ and a next character exists
+
+			switch text[i+1] { // check which character comes after \
+			case 'n':
+				result.WriteByte('\n') // \n or \\\n (odd \) -> newline
+				i++
+				continue
+
+			case 't':
+				result.WriteString(tabSpaces) // \t (odd \) -> 2 spaces
+				i++
+				continue
+
+			case '\\': // each \\ pair becomes a single \
+				result.WriteByte('\\') // \\ -> \    \\\\ -> \\
+				i++
+				continue
+
+			case '"':
+				result.WriteByte('"') // \" -> " (remove \ and keep ") ex: \"hi\" -> "hi"
+				i++                   // skip the " we already handled
+				continue              // move to next
+			}
+		}
+
+		result.WriteByte(text[i]) // write normal characters as they are
+	}
+
+	return result.String() // return the new string
+}
+
+// single quotes '': bash changes nothing
+// double quotes "": bash halves \\ first
